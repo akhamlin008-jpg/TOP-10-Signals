@@ -357,14 +357,27 @@ def run_window_backtest(ctx: StrategyContext, start_date, end_date, budget_scale
 
         if compare_top10 and started_top10:
             w0 = target_weights_top10_only(ctx, d)
+
+            missing0 = [
+                t for t in w0.index
+                if w0.loc[t] > 0 and ((t not in ctx.prices.columns) or pd.isna(ctx.prices.loc[d, t]))
+            ]
+            if missing0:
+                if MISSING_PRICE_POLICY_AFTER_START == "raise":
+                    raise RuntimeError(f"Missing prices on {d.date()} for tickers: {missing0}")
+                w0 = w0.drop(index=missing0)
+                w0 = w0 / w0.sum()
+
             target_w0 = pd.Series(0.0, index=ctx.portfolio_universe)
             target_w0.loc[w0.index] = w0.values
             good0 = target_w0[target_w0 > 0].index
 
             V_after0 = float((shares_top10 * pxd).sum()) + float(C_now)
+
             shares_top10[:] = 0.0
             shares_top10.loc[good0] = (V_after0 * target_w0.loc[good0]) / ctx.prices.loc[d, good0]
             eq_top10.loc[d] = float((shares_top10 * pxd).sum())
+
 
     spy_equity = build_spy_equity(ctx.prices_spy.loc[cal_w], contrib_series)
 
