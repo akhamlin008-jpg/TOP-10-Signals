@@ -785,9 +785,9 @@ with tab1:
 with tab2:
     b1, b2, b3, b4 = st.columns(4)
     with b1:
-        bt_start = st.date_input("Backtest start", value=ctx.cal.min().date(), key="bt_start")
+        bt_start = st.date_input("Backtest start", value=ctx.cal.min().date(), min_value=ctx.cal.min().date(), max_value=ctx.cal.max().date(), key="bt_start")
     with b2:
-        bt_end = st.date_input("Backtest end", value=ctx.cal.max().date(), key="bt_end")
+        bt_end = st.date_input("Backtest end", value=ctx.cal.max().date(), min_value=ctx.cal.min().date(), max_value=ctx.cal.max().date(), key="bt_end")
     with b3:
         bt_budget = st.number_input("Monthly budget", min_value=0.0, value=100.0, step=25.0, key="bt_budget")
     with b4:
