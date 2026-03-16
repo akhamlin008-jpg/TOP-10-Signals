@@ -71,6 +71,9 @@ def _clean_snapshot_df(snap: pd.DataFrame) -> pd.DataFrame:
     snap["snapshot_date"] = pd.to_datetime(snap["snapshot_date"]).dt.normalize()
     snap["ticker"] = snap["ticker"].astype(str).str.upper().str.strip()
 
+    BAD_TICKERS = {"GEC"}
+    snap = snap[~snap["ticker"].isin(BAD_TICKERS)].copy()
+
     if "weight_norm_top10" in snap.columns:
         wcol = "weight_norm_top10"
     elif "weight_pct" in snap.columns:
